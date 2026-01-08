@@ -4,7 +4,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
 import { Search } from 'lucide-react';
 
-export default function ArticleSearch() {
+export default function     AdminSearch() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
@@ -16,17 +16,20 @@ export default function ArticleSearch() {
         } else {
             params.delete('q');
         }
+        // Reset to page 1 when searching
+        params.set('page', '1');
         replace(`${pathname}?${params.toString()}`);
     }, 300);
 
     return (
-        <div className="relative max-w-md mx-auto mb-12">
-            <label htmlFor="search" className="sr-only">
-                Search
+        <div className="relative">
+            <label htmlFor="admin-search" className="sr-only">
+                Search articles
             </label>
             <input
-                className="peer block w-full rounded-md py-[9px] pl-10 text-sm border border-2 border-neutral-400  placeholder:text-gray-500"
-                placeholder="Search articles..."
+                id="admin-search"
+                className="peer block w-full rounded-lg border-2 border-gray-300 py-2.5 pl-10 pr-4 text-sm  placeholder:text-gray-500 focus:border-gray-900 focus:outline-gray-900"
+                placeholder="Search articles by title, slug, or excerpt..."
                 onChange={(e) => handleSearch(e.target.value)}
                 defaultValue={searchParams.get('q')?.toString()}
             />
@@ -34,3 +37,4 @@ export default function ArticleSearch() {
         </div>
     );
 }
+

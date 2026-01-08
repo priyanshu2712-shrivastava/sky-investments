@@ -10,57 +10,59 @@ import ChartComponent from '@/components/ChartComponent';
 interface PageProps {
     params: Promise<{ slug: string }>;
 }
-
-async function getArticle(slug: string) {
-    await dbConnect();
-    const article = await Article.findOne({ slug, isPublished: true }).lean();
-    if (!article) return null;
-
-    return {
-        ...article,
-        _id: article._id.toString(),
-        publishedAt: article.publishedAt.toISOString(),
-    };
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { slug } = await params;
-    const article = await getArticle(slug);
-
-    if (!article) {
+    async function getArticle(slug: string) {
+        try{
+        const res = await fetch(`http://localhost:3000/api/articles/${slug}`,{cache:'force-cache'});
+        const article = await res.json();
         return {
-            title: 'Article Not Found',
+            ...article,
+            _id: article._id.toString(),
+            publishedAt: article.publishedAt,
+        };
+    }
+    catch(error){
+        console.error("Error in getArticle:", error);
+        return null;
+    }
+    }
+
+    export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+        const { slug } = await params;
+        const article = await getArticle(slug);
+
+        if (!article) {
+            return {
+                title: 'Article Not Found',
+            };
+        }
+
+        return {
+            title: `${article.title} | Sky Investment`,
+            description: article.excerpt,
         };
     }
 
-    return {
-        title: `${article.title} | Sky Investment`,
-        description: article.excerpt,
-    };
-}
+    export default async function BlogPost({ params }: PageProps) {
+        const { slug } = await params;
+        const article: any = await getArticle(slug);
+        if (!article) {
+            notFound();
+        }
 
-export default async function BlogPost({ params }: PageProps) {
-    const { slug } = await params;
-    const article: any = await getArticle(slug);
-console.log(article)
-    if (!article) {
-        notFound();
-    }
-
-    const parseOptions = {
-        replace: (domNode: DOMNode) => {
-            if (domNode instanceof Element && domNode.attribs && domNode.attribs['data-type'] === 'chart') {
-                try {
-                    const data = JSON.parse(domNode.attribs['data-chart-data'] || '[]');
-                    const props = {
-                        type: domNode.attribs['data-chart-type'] as any,
-                        data: data,
-                        dataKey: domNode.attribs['data-chart-datakey'],
-                        xAxisKey: domNode.attribs['data-chart-xaxiskey'],
-                        title: domNode.attribs['data-chart-title'],
-                    };
-                    return <ChartComponent {...props} />;
-                } catch (e) {
+        const parseOptions = {
+            replace: (domNode: DOMNode) => {
+                if (domNode instanceof Element && domNode.attribs && domNode.attribs['data-type'] === 'chart') {
+                    try {
+                        const data = JSON.parse(domNode.attribs['data-chart-data'] || '[]');
+                        const props = {
+                            type: domNode.attribs['data-chart-type'] as any,
+                            data: data,
+                            dataKey: domNode.attribs['data-chart-datakey'],
+                            xAxisKey: domNode.attribs['data-chart-xaxiskey'],
+                            title: domNode.attribs['data-chart-title'],
+                        };
+                        return <ChartComponent {...props} />;
+                    } catch (e) {
                     console.error('Failed to parse chart data', e);
                     return null;
                 }

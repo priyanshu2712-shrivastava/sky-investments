@@ -3,20 +3,44 @@ import dbConnect from '@/lib/mongodb';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-
+import { daysInWeek } from 'date-fns/constants';
+import { redis,testRedis } from '@/uitls/redisConncection';
 export async function GET(request: Request) {
     try {
         await dbConnect();
         const { searchParams } = new URL(request.url);
         const isAdmin = searchParams.get('admin') === 'true';
-
-        let query = {};
+        const title= searchParams.get('q') || '';
+        const category= searchParams.get('category')
+        const trending= searchParams.get('trending') ==='true';
+        const PAGE_SIZE=10;
+        const page= parseInt(searchParams.get('page') || '1',10);
+        const query:any = {};
         if (!isAdmin) {
-            query = { isPublished: true };
+            query.isPublished= true 
         }
+        if(title) query.title = { $regex: title, $options: 'i' };
+        if(category && category !== 'All') query.category = category; 
+        if(trending) query.isTrending = trending;
+         const total = await Article.countDocuments(query);
+         
+        const articles = await Article.find(query)
+            .sort({ publishedAt: -1 })
+            .select('title slug excerpt publishedAt category isTrending')
+            .skip((page - 1) * PAGE_SIZE)
+            .limit(PAGE_SIZE)
+            .lean();
 
-        const articles = await Article.find(query).sort({ publishedAt: -1 }).limit(50);
-        return NextResponse.json(articles);
+        return NextResponse.json({
+            items: articles.map(article => ({
+                ...article,
+                _id: article._id.toString(),
+                publishedAt: article.publishedAt.toISOString(),
+            })),
+            total,
+            totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+        });
+     
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch articles' }, { status: 500 });
     }
@@ -41,7 +65,8 @@ export async function POST(request: Request) {
             ...body,
             author: session.user?.name || 'Admin',
         });
-
+        await redis.del('articles:public');
+        await redis.del('articles:admin');
         return NextResponse.json(article, { status: 201 });
     } catch (error: any) {
         // Handle duplicate key error for slug

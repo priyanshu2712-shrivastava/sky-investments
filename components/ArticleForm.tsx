@@ -11,18 +11,32 @@ interface ArticleFormProps {
 export default function ArticleForm({ initialData }: ArticleFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const categoryOptions = [
+        'Market Analysis & Trends',
+        'IPO & Listing Insights',
+        'Sector Deep Dives',
+        'Growth Companies',
+        'Personal Finance & Wealth Creation',
+        'Commodities & Alternative Assets',
+        'Geopolitics & Macroeconomics',
+        'Financial Literacy & Basics',
+    ];
+
     const [formData, setFormData] = useState({
         title: initialData?.title || '',
         slug: initialData?.slug || '',
         excerpt: initialData?.excerpt || '',
         content: initialData?.content || '',
         coverImage: initialData?.coverImage || '',
+        category: initialData?.category || categoryOptions[0],
+        isTrending: initialData?.isTrending ?? false,
         isPublished: initialData?.isPublished ?? false, // Default false
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const target = e.target as HTMLInputElement;
+        setFormData(prev => ({ ...prev, [name]: target.type === 'checkbox' ? target.checked : value }));
     };
 
     const generateSlug = () => {
@@ -98,6 +112,22 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
                 </div>
                 <div className="space-y-4">
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white"
+                            required
+                        >
+                            {categoryOptions.map((category) => (
+                                <option key={category} value={category}>
+                                    {category}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image URL</label>
                         <input
                             type="text"
@@ -107,20 +137,34 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
                             placeholder="https://..."
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                         />
-                        {/* Could add logic to drag/drop upload here too, but simple string input is fine or just rely on Editor for content images. User asked for Cover Image store in DB. */}
                     </div>
-                    <div className="flex items-center gap-2 pt-8">
-                        <input
-                            type="checkbox"
-                            id="isPublished"
-                            name="isPublished"
-                            checked={formData.isPublished}
-                            onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
-                            className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
-                        />
-                        <label htmlFor="isPublished" className="text-sm font-medium text-gray-700 select-none">
-                            Publish immediately?
-                        </label>
+                    <div className="flex items-center gap-6 pt-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isTrending"
+                                name="isTrending"
+                                checked={formData.isTrending}
+                                onChange={(e) => setFormData(prev => ({ ...prev, isTrending: e.target.checked }))}
+                                className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                            />
+                            <label htmlFor="isTrending" className="text-sm font-medium text-gray-700 select-none">
+                                Trending
+                            </label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isPublished"
+                                name="isPublished"
+                                checked={formData.isPublished}
+                                onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
+                                className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                            />
+                            <label htmlFor="isPublished" className="text-sm font-medium text-gray-700 select-none">
+                                Publish immediately?
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,22 +3,31 @@ import dbConnect from '@/lib/mongodb';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-
+import { redis } from '@/uitls/redisConncection';
 export async function GET(
     request: Request,
-    { params }: { params: Promise<{ slug: string }> } // In Next 15 params is a promise
+    { params }: { params: Promise<{ slug: string }> } 
 ) {
     try {
         await dbConnect();
         const { slug } = await params;
+        const cacheKey= `article:${slug}`;
+            const cached = await redis.get(cacheKey);
+            if(cached){
+               console.log("Returning cached article for slug:", slug);
+               return NextResponse.json(cached);
+            }
         const article = await Article.findOne({ slug });
-
+await redis.set(cacheKey,article, {
+    ex: 7*24*60*60,
+});
         if (!article) {
             return NextResponse.json({ error: 'Article not found' }, { status: 404 });
         }
 
         return NextResponse.json(article);
     } catch (error) {
+        console.error("Error fetching article:", error);
         return NextResponse.json({ error: 'Failed to fetch article' }, { status: 500 });
     }
 }
@@ -41,7 +50,7 @@ export async function PUT(
             new: true,
             runValidators: true,
         });
-
+await redis.del(`article:${slug}`);
         if (!article) {
             return NextResponse.json({ error: 'Article not found' }, { status: 404 });
         }
@@ -65,7 +74,7 @@ export async function DELETE(
         await dbConnect();
         const { slug } = await params;
         const article = await Article.findOneAndDelete({ slug });
-
+        await redis.del(`article:${slug}`);
         if (!article) {
             return NextResponse.json({ error: 'Article not found' }, { status: 404 });
         }

@@ -73,9 +73,8 @@ export async function POST(request: Request) {
             };
         }
 
-        // Import pdf-parse - works with CommonJS in Node.js
-        const pdfParse = require('pdf-parse');
-        const data = await pdfParse(buffer);
+        const pdf = require('pdf-parse');
+        const data = await pdf(buffer);
         const rawText = data.text;
 
 
@@ -108,6 +107,8 @@ export async function POST(request: Request) {
             author: session.user?.name || 'Admin',
             isPublished: false, // Always draft
             coverImage: '', // No cover image from PDF text
+            category: 'Market Analysis & Trends', // Default category for imported PDFs
+            isTrending: false,
         });
 
         return NextResponse.json({

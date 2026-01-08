@@ -7,6 +7,8 @@ export interface IArticle extends Document {
     content: string;
     coverImage?: string;
     author: string;
+    category: string;
+    isTrending: boolean;
     publishedAt: Date;
     isPublished: boolean;
     createdAt: Date;
@@ -23,6 +25,8 @@ const ArticleSchema: Schema = new Schema(
         content: { type: String, required: true },
         coverImage: { type: String },
         author: { type: String, required: true },
+        category: { type: String, required: true, default: 'Market Analysis & Trends' },
+        isTrending: { type: Boolean, default: false },
         publishedAt: { type: Date, default: Date.now },
         isPublished: { type: Boolean, default: false },
         views: { type: Number, default: 0 },
