@@ -13,18 +13,25 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY >20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => {window.removeEventListener('scroll', handleScroll)
-            setScrolled(false)
-        };
-    }, []);
+useEffect(() => {
+  let last = false;
+
+  const handleScroll = () => {
+    const next = window.scrollY > 20;
+    if (next !== last) {
+      last = next;
+      setScrolled(next);
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
     const navLinks = [
         { name: 'Home', href: '/' },
+         { name: 'About', href: '#about' },
+          { name: 'Contact Us', href: '#contact' },
         { name: 'Articles', href: '/articles' },
     ];
 
@@ -36,9 +43,9 @@ export default function Navbar() {
         <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
-            className={`sticky top-0  w-full z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/50 backdrop-blur-md shadow-sm py-3 border-b border-gray-200/50'
-                    : 'bg-transparent py-5 border-b border-transparent'
+            className={`sticky top-0  w-full z-50 py-3  transition-all duration-300 ${scrolled
+                    ? 'bg-white/50 px-12 backdrop-blur-md shadow-sm border-b border-gray-200/50'
+                    : 'bg-transparent  border-b border-transparent'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -73,21 +80,22 @@ export default function Navbar() {
                         </Link>
                     ))}
 
-                    {session ? (
+                    {session &&
                         <button
                             onClick={() => signOut()}
                             className=" text-sm font-medium text-slate-600 hover:text-red-600 transition-colors"
                         >
                             Log out
                         </button>
-                    ) : (
-                        <Link
-                            href="/articles"
-                            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20"
-                        >
-                            Read Insights <ArrowRight size={14} />
-                        </Link>
-                    )}
+                    // ) : (
+                    //     <Link
+                    //         href="/articles"
+                    //         className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20"
+                    //     >
+                    //         Read Insights <ArrowRight size={14} />
+                    //     </Link>
+                    // )
+                    }
                 </div>
 
                 {/* Mobile Toggle */}

@@ -4,6 +4,7 @@ import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { daysInWeek } from 'date-fns/constants';
+import { redis } from '@/utils/redisConncection';
 // import { redis} from '@/utils/redisConncection';
 export async function GET(request: Request) {
     try {
@@ -59,10 +60,9 @@ export async function POST(request: Request) {
         if (!body.title || !body.content || !body.slug) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
-console.log(session.user)
         const article = await Article.create({
             ...body,
-            author: session.user?.name || 'Admin',
+            author: "Akash Singh",
         });
         return NextResponse.json(article, { status: 201 });
     } catch (error: any) {

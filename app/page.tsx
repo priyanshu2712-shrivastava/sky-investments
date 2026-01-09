@@ -1,25 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import {
-  ArrowRight,
-  TrendingUp,
-  Shield,
-  BarChart3,
-  Briefcase,
-  CircleDollarSign,
-  PieChart,
-  Landmark,
-  Wallet,
-  Globe,
-  Coins
-} from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Footer from '@/components/Footer';
 import AnimatedSpanText from '@/components/AnimatedSpanText';
-
+import Link from 'next/link';
 // Floating Icon Component
 const FloatingIcon = ({ icon: Icon, delay, x, y }: { icon: any, delay: number, x: string, y: string }) => (
   <motion.div
@@ -42,39 +28,7 @@ const FloatingIcon = ({ icon: Icon, delay, x, y }: { icon: any, delay: number, x
 
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-
-  
-const floatingIcons = [
-  { icon: TrendingUp, delay: 0 },
- 
- 
-  { icon: PieChart, delay: 1.5 },
-  { icon: Landmark, delay: 3 },
-  { icon: Wallet, delay: 2.5 },
- { icon: CircleDollarSign, delay: 2 },
-  { icon: Coins, delay: 3.5 },
-];
-const trigSpread = (
-   index: number,
-  min = 10,
-  max = 90
-) => {
-  const range = (max - min);
-  const angle = index * 1.3999632297; // golden angle
-
-  const x = (Math.cos(angle) + 1) / 2;
-  const y = (Math.sin(angle) + 1) / 2;
-
-  return {
-    x: `${min-index + (x * range)}%`,
-    y: `${min+index + (y * range)}%`,
-  };
-};
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+   
   return (
     <div className="bg-white  w-full h-fit">
       {/* Hero Section */}
@@ -112,7 +66,7 @@ equities, commodities, and market cycles.
   </p>
   <p className="mt-6 text-slate-700 text-justify leading-relaxed">Welcome to the journey. Let’s learn, build, and compound knowledge-   one insight at a time.</p>
 </div>
-<p className="mt-10 text-xs text-slate-400 max-w-xl text-center">
+<p id='disclaimer' className="mt-10 text-xs text-yellow-700 tracking-relaxed max-w-xl text-center  ">
   Educational content only. Not SEBI-registered. Please consult a qualified
   financial advisor before making investment decisions.
 </p>
@@ -210,36 +164,28 @@ to-white backdrop-blur-md  grid-items">
 }
 
 
-function BlogShowCase(){
-  const blogs = [
-  {
-    id: 1,
-    title: "India’s Growth Story and the Sectors Leading the Next Decade",
-    excerpt:
-      "A deep dive into the sectors driving India’s economic expansion and the companies positioned to benefit.",
-    image: "/blogs/india-growth.jpg",
-    category: "India Growth",
-    readTime: "6 min read",
-  },
-  {
-    id: 2,
-    title: "Understanding Market Psychology During Volatile Phases",
-    excerpt:
-      "Why emotions dominate decision-making during market stress and how to think clearly.",
-    image: "/blogs/market-psychology.jpg",
-    category: "Psychology",
-    readTime: "5 min read",
-  },
-  {
-    id: 3,
-    title: "Commodities Explained: Cycles, Demand, and Price Behaviour",
-    excerpt:
-      "An overview of commodity cycles and how macro forces influence pricing.",
-    image: "/blogs/commodities.jpg",
-    category: "Commodities",
-    readTime: "7 min read",
-  },
-];
+ function BlogShowCase(){
+const [blogs, setBlogs] = useState<any[]>([]);
+
+const trendingArticles = async () => {
+  try {
+  
+    const res = await fetch('/api/blog');
+
+    if (!res.ok) throw new Error("Failed to fetch blogs");
+
+    const data = await res.json();
+    console.log(data);
+    setBlogs(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+useEffect(() => {
+  trendingArticles();
+}, []);
+
   return (
     <section className="w-full bg-white py-12">
       <div className="mx-auto max-w-6xl px-4">
@@ -256,28 +202,26 @@ function BlogShowCase(){
 
         {/* Grid */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {blogs.map((blog) => (
+          {blogs && blogs.map((blog,idx) => (
             <article
-              key={blog.id}
+              key={idx}
               className="group rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition"
             >
               {/* Image */}
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1765634898818-93107993be03?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              
+              <div className=" h-48 overflow-hidden">
+                <Image 
+                src={blog.coverImage.startsWith("data")?blog.coverImage:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAe1BMVEUAAAD///8dHR3s7OxhYWHm5uZwcHC9vb37+/sgICD09PTw8PDMzMwMDAxra2uHh4cvLy+goKDX19dFRUXDw8Ph4eF9fX1lZWUlJSWurq7Z2dmnp6c9PT2NjY1MTEwYGBhZWVnHx8eZmZmAgIAxMTFTU1OMjIw+Pj62tra7Pb1vAAAEfklEQVR4nO3baVfyOhSGYaAUESoqCg6gDA6H//8LD6ivkqdtkrak0bXu66sJyXaTNhOdDgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgnvNeqXOz5Oq+vGhh9Ys4EYntOCk1fjCKLtPyooXSx20/Ulg/7kddi+GVUXhnK1siWTxHCu3Ltb1/C6PwskaEe9lNpOAOVtYU7pPYM4rf1guxu4s3Iheuvm2N4s81I+yOY41H+yg8GJkVNnVD7F7GifDJ3TMziW+1I+w+xQjwInF37GRJjJJFjxRqx2qPxL1B+xF6pHD/QjPrZPUjHLb+1nj369jcqLSuH2F31naEXinM9atBErvX7Qb4Is0naTL+oP0yk9hPZ7NZeuyr2pfR8J+CEF9bjVBSmK46q/ODnj5NCr5cF8c+q/1z9W35NNMId20GeCmNv//86cyaxCrmOqX47wQ995WaTY+P/nQj3Xqs38pqan5UiyNRU2hMOXSGfdegIfPJlDbsdgUyCker4z9qErPTtbRu8lFV6IPUnH7mXglNlgYT45Me3BVOQ1MoWzJ9iXDapK1ddqStgagpzLUrD4juuqWOnYy8qMxReHB3ypEYwdyVwnwSY+611KApPM8X0Rn2Wfu9bGAivS8c/ZrEZdu9bOLR7PuwcD6sj9O/lER9ipT0XafNbU4pG5IUln3/BlKs1XVBI54pzM0Khn9mJHqmMD8tWJQV/GU0hZYvnyywil4qv5F3Cv9qEvVduLEV1iT2bIUPdmcut8EP2yrNxpwTdFW0+yRC7wtrCh3LItl3G7lOyZwnPeEj1BQ6lra677+1F/8FEerZkXNRJF12bbPEj3Ajza1dFfQU3HGAFD3Cyins9KTPib149Ah1l3DtrrKVKi/W0rEjrLNJeFFpJMaOcCONeW306ki0bvFHjlBT6Hecp0m0bvFHjlBHoWdbD1JtYikbN0J9kPoeIbzKVMyWxLizNk2h95mZXmezDN/JEd0jCB6hjkL/UyC9zua5xa8NBo9wUzeF+SS+edUquRQYLEI9uq5ykPcqda1rym+5+wCBI6w9Cg80iT5b/GWXAkNFqGOp2lms1vZIop4xB49Qs+Ba6An9Bji3IsovlAWK8EqaGVe80qrPxVtHcV1oh4+wYQorbe8sL63XpsJEeC9zDccqr4AetqXTaTbNsmyzW1w/vcwHH6/4+fv2LMvdEmolQn2ujVK3xBxrTa6zhY9QZ5Z+zAdmkzuJxgFIkAh1deDJHGv1k7gz9glCROi+r17MTGLtK9635vwtRIQ1U6hvPcsbwCbrBI/wqtYoPDCPpXS73M/hixA6QuevRsqZ51J6auXj458UOEJ9F1ZhXkIrWdJaDD83kANHWHsU7o3M3665XuYq+/oOhI2w1yCFzZKYfscSNkLHz+8c5KqNfxJH03lJH04eoedPDsqYj1O9D1dgOE5ms83c+M9sk6PJYJP7xoWe7/qNmJ/W70/mg0+XP14Gg/ldf/22d7O8/x2//gUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQ0/+ydT0yi70lewAAAABJRU5ErkJggg=="}
                   alt={blog.title}
                   width={300}
                   height={300}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-
+ 
               {/* Content */}
               <div className="p-6">
-                <div className="mb-2 text-xs font-medium text-sky-500 uppercase">
-                  {blog.category}
-                </div>
-
+               
                 <h3 className="text-lg font-semibold text-slate-900 leading-snug">
                   {blog.title}
                 </h3>
@@ -285,6 +229,9 @@ function BlogShowCase(){
                 <p className="mt-3 text-sm text-slate-600 line-clamp-2">
                   {blog.excerpt}
                 </p>
+ <div className="mt-3 text-[10px] font-semibold text-sky-500 uppercase border-sky-500 inline-block px-2 py-1 rounded-full bg-sky-100">
+                  {blog.category}
+                </div>
 
                 <div className="mt-5 flex items-center justify-between text-xs text-slate-500">
                   <span>{blog.readTime}</span>
@@ -299,8 +246,10 @@ function BlogShowCase(){
 
         {/* CTA */}
         <div className="mt-16 text-center">
-          <button className="rounded-xl border border-slate-300 px-6 py-3 text-slate-700 hover:bg-slate-100 transition">
-            View all blogs
+          <button className="rounded-xl border border-slate-300 px-6 py-3 text-slate-700 hover:bg-slate-100 transition"
+          >
+            <Link href={"/articles"}>View all blogs</Link>
+            
           </button>
         </div>
       </div>

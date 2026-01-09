@@ -1,8 +1,5 @@
 import ArticleCard from '@/components/ArticleCard';
-import dbConnect from '@/lib/mongodb';
-import Article from '@/models/Article';
 import ArticleSearch from '@/components/ArticleSearch';
-// Force dynamic
 export const revalidate=60;
 const CATEGORIES = [
     'Market Analysis & Trends',
@@ -74,17 +71,6 @@ export default async function ArticlesPage({
 
     return (
         <div className="min-h-screen bg-white">
-            {/* <div className="bg-gray-50 py-10 border-b border-gray-100">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6 tracking-tight">
-                        Insights
-                    </h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto font-serif italic">
-                        Deep dives into market trends, asset allocation, and financial planning.
-                    </p>
-                </div>
-            </div> */}
-
             <div className="max-w-4xl mx-auto px-6 ">
                 <div className="mb-8">
                     <ArticleSearch />
