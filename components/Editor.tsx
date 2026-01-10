@@ -24,6 +24,7 @@ import {
     Subscript as SubscriptIcon, Superscript as SuperscriptIcon, Plus, ChevronDown
 } from 'lucide-react';
 import ChartExtension from './extensions/ChartExtension';
+import ChartModal from './ChartModal';
 
 import { useCallback, useState, useEffect, useRef } from 'react';
 
@@ -34,6 +35,7 @@ interface EditorProps {
 
 export default function Editor({ value, onChange }: EditorProps) {
     const [headingMenuOpen, setHeadingMenuOpen] = useState(false);
+    const [isChartModalOpen, setIsChartModalOpen] = useState(false);
     const headingMenuRef = useRef<HTMLDivElement>(null);
 
     const editor = useEditor({
@@ -61,6 +63,9 @@ export default function Editor({ value, onChange }: EditorProps) {
             Link.configure({
                 openOnClick: false,
                 autolink: true,
+                HTMLAttributes: {
+                    class: 'text-blue-600 underline decoration-blue-400 hover:text-blue-800 transition-colors cursor-pointer',
+                },
             }),
             Underline,
             TextAlign.configure({
@@ -76,7 +81,7 @@ export default function Editor({ value, onChange }: EditorProps) {
         content: value,
         editorProps: {
             attributes: {
-                class: 'prose prose-lg max-w-none focus:outline-none min-h-[350px]',
+                class: 'prose prose-lg max-w-none focus:outline-none min-h-[350px] prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline',
             },
         },
         onUpdate: ({ editor }) => {
@@ -157,16 +162,19 @@ export default function Editor({ value, onChange }: EditorProps) {
 
 
     const handleAddChart = useCallback(() => {
+        setIsChartModalOpen(true);
+    }, []);
+
+    const handleSaveChart = useCallback((chartData: any) => {
         if (!editor) return;
-        const defaultData = { type: 'bar', data: [{ name: 'A', value: 100 }, { name: 'B', value: 200 }, { name: 'C', value: 150 }], dataKey: 'value', xAxisKey: 'name', title: 'My Chart' };
-        const dataString = prompt('Enter Chart Data (JSON)', JSON.stringify(defaultData));
-        if (dataString) {
-            try {
-                const chartData = JSON.parse(dataString);
-                if (!chartData.data || !Array.isArray(chartData.data)) { alert('Invalid data'); return; }
-                editor.chain().focus().insertContent({ type: 'chart', attrs: chartData }).run();
-            } catch (e) { alert('Invalid JSON'); }
-        }
+        editor.chain().focus().insertContent({
+            type: 'chart',
+            attrs: {
+                ...chartData,
+                dataKey: 'value',
+                xAxisKey: 'name'
+            }
+        }).run();
     }, [editor]);
 
     const setLink = useCallback(() => {

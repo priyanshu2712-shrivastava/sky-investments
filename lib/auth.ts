@@ -1,44 +1,48 @@
 import { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        CredentialsProvider({
-            name: 'Admin',
-            credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
-            },
-            async authorize(credentials) {
-                const adminEmail = process.env.ADMIN_EMAIL;
-                const adminPassword = process.env.ADMIN_PASSWORD;
-
-                if (
-                    credentials?.email === adminEmail &&
-                    credentials?.password === adminPassword
-                ) {
-                    return { id: '1', name: 'Admin', email: adminEmail, role: 'admin' };
-                }
-                return null;
-            }
-        })
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
     ],
     pages: {
         signIn: '/login',
+        error: '/login',
     },
     callbacks: {
+        async signIn({ user }) {
+            // Server-side email restriction - CRITICAL SECURITY CHECK
+            const adminEmail = process.env.ADMIN_EMAIL;
+
+            if (!adminEmail) {
+                console.error('ADMIN_EMAIL not configured');
+                return false;
+            }
+
+            // Only allow the predefined admin email
+            if (user.email?.toLowerCase() === adminEmail.toLowerCase()) {
+                return true;
+            }
+
+            // Block all other emails
+            console.log(`Access denied for: ${user.email}`);
+            return false;
+        },
         async jwt({ token, user }) {
             if (user) {
-                token.role = (user as any).role;
+                token.role = 'admin';
             }
             return token;
         },
         async session({ session, token }) {
             if (session?.user) {
-                (session.user as any).role = token.role;
+                (session.user as { role?: string }).role = token.role as string;
             }
             return session;
-        }
+        },
     },
     session: {
         strategy: 'jwt',
