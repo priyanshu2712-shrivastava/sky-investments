@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Editor from './Editor';
 
@@ -10,7 +10,11 @@ interface ArticleFormProps {
 
 export default function ArticleForm({ initialData }: ArticleFormProps) {
     const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [localFileName, setLocalFileName] = useState('');
+
     const categoryOptions = [
         'Market Analysis & Trends',
         'IPO & Listing Insights',
@@ -34,9 +38,43 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        const target = e.target as HTMLInputElement;
-        setFormData(prev => ({ ...prev, [name]: target.type === 'checkbox' ? target.checked : value }));
+        const { name, value, type } = e.target;
+
+        if (name === 'coverImage') {
+            setLocalFileName(''); // Clear local filename when manual input occurs
+            setFormData(prev => ({ ...prev, coverImage: value }));
+        } else {
+            const isCheckbox = type === 'checkbox';
+            const val = isCheckbox ? (e.target as HTMLInputElement).checked : value;
+            setFormData(prev => ({ ...prev, [name]: val }));
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadData,
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+
+            const data = await res.json();
+            setFormData(prev => ({ ...prev, coverImage: data.secure_url }));
+            setLocalFileName(file.name); // Show filename in the input
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Failed to upload image');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const generateSlug = () => {
@@ -128,16 +166,55 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image URL</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                name="coverImage"
+                                value={localFileName || formData.coverImage}
+                                onChange={handleChange}
+                                placeholder="https://... or upload local image"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploading}
+                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded border border-gray-300 hover:bg-gray-200 transition-colors text-sm font-medium whitespace-nowrap"
+                            >
+                                {uploading ? 'Uploading...' : 'Browse'}
+                            </button>
+                        </div>
                         <input
-                            type="text"
-                            name="coverImage"
-                            value={formData.coverImage}
-                            onChange={handleChange}
-                            placeholder="https://..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
                         />
+                        {formData.coverImage && (
+                            <div className="mt-2 relative aspect-video w-full max-w-xs rounded overflow-hidden border border-gray-200">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={formData.coverImage}
+                                    alt="Cover Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData(prev => ({ ...prev, coverImage: '' }));
+                                        setLocalFileName('');
+                                    }}
+                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors shadow-md"
+                                    title="Remove Image"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                        )}
                     </div>
+
                     <div className="flex items-center gap-6 pt-2">
                         <div className="flex items-center gap-2">
                             <input
