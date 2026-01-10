@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
+import Image from 'next/image';
 
 export default function Navbar() {
     const { data: session } = useSession();
@@ -13,20 +15,29 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+useEffect(() => {
+  let last = false;
 
-    const navLinks = [
+  const handleScroll = () => {
+    const next = window.scrollY > 20;
+    if (next !== last) {
+      last = next;
+      setScrolled(next);
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+    let navLinks = [
         { name: 'Home', href: '/' },
+         { name: 'About', href: '#about' },
         { name: 'Articles', href: '/articles' },
     ];
 
     if (session) {
+        navLinks= navLinks.filter(link=> link.name!=="About")
         navLinks.push({ name: 'Dashboard', href: '/admin' });
     }
 
@@ -34,19 +45,19 @@ export default function Navbar() {
         <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
-            className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/90 backdrop-blur-md shadow-sm py-4 border-b border-gray-200/50'
-                    : 'bg-transparent py-6 border-b border-transparent'
+            className={`sticky top-0  w-full z-50 py-3  transition-all duration-300 ${scrolled
+                    ? 'bg-white/50 dark:bg-black/50  md:px-12 backdrop-blur-md shadow-sm border-b border-gray-200/50'
+                    : 'bg-transparent border-b border-transparent'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="group relative z-50">
+                <Link href="/" className="group relative ">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center text-white font-serif font-bold text-lg">
-                            S
+                        <div className=" rounded-lg flex items-center justify-center text-white font-serif font-bold text-lg">
+                           <Image src="/favicon/favicon-96x96.png" height={25} width={25} alt='logo'/>
                         </div>
-                        <span className={`font-serif text-xl font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-slate-900'}`}>
+                        <span className={`font-serif text-xl hidden dark:text-neutral-200 md:flex font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-neutral-400 '}`}>
                             Sky Investment
                         </span>
                     </div>
@@ -58,8 +69,8 @@ export default function Navbar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`text-sm font-medium transition-colors relative group ${pathname === link.href ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900'
-                                }`}
+                            className={`text-sm font-medium transition-colors relative group ${pathname === link.href ? 'text-blue-600' : 'text-slate-600 '
+                                } hover:text-indigo-600`}
                         >
                             {link.name}
                             {pathname === link.href && (
@@ -71,23 +82,25 @@ export default function Navbar() {
                         </Link>
                     ))}
 
-                    {session ? (
+                    {session &&
                         <button
                             onClick={() => signOut()}
-                            className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                            className=" text-sm font-medium text-slate-600 hover:text-red-600 transition-colors"
                         >
                             Log out
                         </button>
-                    ) : (
-                        <Link
-                            href="/articles"
-                            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20"
-                        >
-                            Read Insights <ArrowRight size={14} />
-                        </Link>
-                    )}
+                    // ) : (
+                    //     <Link
+                    //         href="/articles"
+                    //         className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20"
+                    //     >
+                    //         Read Insights <ArrowRight size={14} />
+                    //     </Link>
+                    // )
+                    }
                 </div>
-
+                <div className='flex gap-2'>
+<ThemeToggle/>
                 {/* Mobile Toggle */}
                 <button
                     className="md:hidden relative z-50 p-2 text-slate-800"
@@ -95,6 +108,7 @@ export default function Navbar() {
                 >
                     {mobileMenuOpen ? <X /> : <Menu />}
                 </button>
+            </div>
             </div>
 
             {/* Mobile Menu */}

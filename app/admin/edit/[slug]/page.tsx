@@ -29,7 +29,7 @@ export default async function EditArticlePage({ params }: EditProps) {
 
     return (
         <div>
-            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-8 border-b pb-4">Edit Article</h1>
+            <h1 className="text-2xl font-serif font-bold text-gray-900 dark:text-white mb-8 border-b pb-4">Edit Article</h1>
             <ArticleForm initialData={article} />
         </div>
     );

@@ -1,9 +1,10 @@
+
 import type { Metadata } from 'next';
 import { Inter, Merriweather } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,15 +31,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${merriweather.variable}`}>
-      <body className="antialiased bg-white text-gray-800 font-sans min-h-screen flex flex-col">
+     
+      <body className="antialiased bg-white text-gray-800 dark:bg-black dark:text-white/40 font-sans min-h-screen flex flex-col">
+        
         <Providers>
+           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           <main className="flex-grow w-full">
             {children}
           </main>
-          <Footer />
-        </Providers>
-      </body>
+            </ThemeProvider>
+        </Providers>       
+      </body>     
     </html>
   );
 }

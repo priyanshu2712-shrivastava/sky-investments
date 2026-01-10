@@ -23,7 +23,7 @@ function LoginContent() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)] px-6">
+        <div className=" flex items-center justify-center h-screen w-full  px-6">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-sm border border-gray-100">
                 <h1 className="text-2xl font-serif font-bold text-gray-900 mb-2 text-center">
                     Admin Access

@@ -1,34 +1,22 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  TrendingUp,
-  Shield,
-  BarChart3,
-  Briefcase,
-  CircleDollarSign,
-  PieChart,
-  Landmark,
-  Wallet,
-  Globe,
-  Coins
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-
+import Image from 'next/image';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Footer from '@/components/Footer';
+import AnimatedSpanText from '@/components/AnimatedSpanText';
+import Link from 'next/link';
 // Floating Icon Component
 const FloatingIcon = ({ icon: Icon, delay, x, y }: { icon: any, delay: number, x: string, y: string }) => (
   <motion.div
-    className="absolute text-blue-500/20 pointer-events-none z-0"
-    initial={{ opacity: 0, x, y }}
+    className={`absolute text-white/70 pointer-events-none z-0`}
+    style={{ top: y, left: x }}
     animate={{
-      opacity: [0.1, 0.3, 0.1],
-      y: ["0px", "-20px", "0px"],
-      rotate: [0, 5, -5, 0]
+      opacity: [0.1, 0.5, 0.1],
+      y: [0, -20, 0],
     }}
     transition={{
-      duration: 5,
+      duration: 15,
       repeat: Infinity,
       delay: delay,
       ease: "easeInOut"
@@ -38,146 +26,338 @@ const FloatingIcon = ({ icon: Icon, delay, x, y }: { icon: any, delay: number, x
   </motion.div>
 );
 
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export default function Home() {
+   
+  return (
+    <div className="bg-white dark:bg-zinc-950 w-full h-fit">
+  {/* Hero Section */}
+  <section className="relative min-h-screen flex flex-col overflow-hidden text-white w-full
+    bg-gradient-to-b
+    from-white via-sky-50 to-white
+    dark:from-zinc-950 dark:via-zinc-900/60 dark:to-zinc-950
+  ">
+    <div className="max-w-3xl flex flex-col items-center justify-start mx-auto mt-5">
+      <div className="relative flex flex-col items-center px-3 py-6 w-full">
+
+        <h1 className="text-slate-900 dark:text-zinc-100 font-black text-[3rem] leading-tight w-full">
+          Hi, I am{" "}
+          <span className="
+            bg-gradient-to-b
+            from-blue-700 via-sky-400 to-transparent
+            dark:from-sky-400 dark:via-cyan-300 dark:to-transparent
+            text-transparent bg-clip-text
+          ">
+            <AnimatedSpanText
+              props={{ textContent: ["Akash Singh", "An Investor", "A Trader"] }}
+            />
+          </span>
+        </h1>
+
+        <p className="mt-4 text-slate-600 w-full dark:text-zinc-400 text-start">
+          A stock market investor & trader with 5+ years of experience navigating
+          equities, commodities, and market cycles.
+        </p>
+
+        <p className="mt-3 italic text-slate-700 dark:text-zinc-500 text-sm md:text-lg font-medium text-end w-full">
+          I don’t trade charts alone—I study the business behind them.
+        </p>
+
+        <div className="
+          absolute bottom-0 w-[50%] h-[1px]
+          bg-gradient-to-r
+          from-transparent via-zinc-600 to-transparent
+          dark:via-zinc-700
+        " />
+      </div>
+
+      {/* Card */}
+      <div className="
+        mt-20 w-full max-w-3xl rounded-2xl border
+        border-slate-200
+        bg-white/60
+        backdrop-blur-sm
+        px-8 py-10 shadow-md
+
+        dark:border-zinc-800
+        dark:bg-zinc-900/60
+        dark:shadow-[0_0_0_1px_rgba(255,255,255,0.02)]
+      ">
+        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-zinc-100 text-center">
+          Sky Investment
+        </h2>
+
+        <div className="
+          mx-auto mt-3 h-[1px] w-24
+          bg-gradient-to-r
+          from-transparent via-sky-600 to-transparent
+          dark:via-cyan-400
+        " />
+
+        <p className="mt-6 text-slate-700 dark:text-zinc-400 text-justify leading-relaxed">
+          This website is my canvas – A place where investing meets clarity,
+          logic, and real-world experience. No noise. No fake gurus. Just honest
+          analysis, real processes, and a mindset built to evolve.
+        </p>
+
+        <p className="mt-6 text-slate-700 dark:text-zinc-400 text-justify leading-relaxed">
+          Welcome to the journey. Let’s learn, build, and compound knowledge –
+          one insight at a time.
+        </p>
+      </div>
+
+      <p
+        id="disclaimer"
+        className="
+          mt-10 text-xs tracking-relaxed max-w-xl text-center
+          text-yellow-700
+          dark:text-yellow-500/80
+        "
+      >
+        Educational content only. Not SEBI-registered. Please consult a qualified
+        financial advisor before making investment decisions.
+      </p>
+    </div>
+  </section>
+
+
+      <InfoSection />
+<BlogShowCase/>
+      <Footer />
+    </div>
+  );
+} 
+
+
+function InfoSection() {
+  return (
+     <section
+  id="about"
+  className="py-24 bg-white dark:bg-zinc-950"
+>
+  <div className="max-w-7xl mx-auto px-6">
+    <div className="text-center mb-8">
+      <h2 className="text-3xl md:text-4xl font-serif font-extrabold text-slate-900 dark:text-zinc-100 mb-4 w-full">
+        Why Sky Investment
+      </h2>
+
+      <div
+        className="
+          w-48 h-[1px] mx-auto rounded-full
+          bg-gradient-to-r from-transparent via-purple-600 to-transparent
+          dark:via-purple-400/80
+        "
+      />
+
+      <p className="mt-3 text-slate-600 dark:text-zinc-400 w-full text-center">
+        Research-driven insights on markets, businesses, and the psychology
+        behind capital and decision-making.
+      </p>
+    </div>
+
+    <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-6 auto-rows-fr max-w-5xl mx-auto perspective-wrapper">
+
+      {/* Card 1 */}
+      <div
+        className="
+          md:col-span-4 rounded-2xl border border-slate-200 bg-slate-50 p-8
+          hover:shadow-lg hover:shadow-slate-100 hover:bg-gradient-to-br hover:from-slate-300 hover:to-white/80
+          
+          dark:border-zinc-800 dark:bg-zinc-900/60
+          dark:hover:bg-gradient-to-br dark:hover:from-zinc-800 dark:hover:to-zinc-900
+          dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.4)]
+          grid-items
+        "
+      >
+        <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-100">
+          India’s Growth Story
+        </h3>
+        <p className="mt-3 text-slate-700 dark:text-zinc-400">
+          Deep dives into the sectors, businesses, and capital flows shaping
+          India’s long-term economic expansion and market leadership.
+        </p>
+      </div>
+
+      {/* Small cards */}
+      {[
+        {
+          title: "Equities & Sectoral Opportunities",
+          text:
+            "Growth companies, emerging sector leaders, and business models driving earnings and scale.",
+          accent: "red",
+        },
+        {
+          title: "Commodities & Macro Trends",
+          text:
+            "Commodity cycles, demand–supply dynamics, and macro forces influencing prices and market sentiment.",
+          accent: "sky",
+        },
+        {
+          title: "Market Psychology",
+          text:
+            "Investor behaviour, trading psychology, and emotional patterns that shape decision-making in markets.",
+          accent: "indigo",
+        },
+        {
+          title: "Money, Risk & Financial Literacy",
+          text:
+            "Frameworks for managing risk, understanding money, and building clarity around long-term investing decisions.",
+          accent: "purple",
+        },
+      ].map(({ title, text, accent }) => (
+        <div
+          key={title}
+          className={`
+            md:col-span-2 rounded-2xl border border-slate-200 p-6 backdrop-blur-md
+            hover:bg-gradient-to-br hover:from-${accent}-300/20 to-white
+            grid-items
+
+            dark:border-zinc-800 dark:bg-zinc-900/50
+            dark:hover:bg-gradient-to-br dark:hover:from-${accent}-400/10 dark:hover:to-zinc-900
+          `}
+        >
+          <h3 className="font-semibold text-slate-900 dark:text-zinc-100">
+            {title}
+          </h3>
+          <p className="mt-2 text-sm text-slate-600 dark:text-zinc-400">
+            {text}
+          </p>
+        </div>
+      ))}
+
+      {/* Wide card */}
+      <div
+        className="
+          md:col-span-6 rounded-2xl border border-slate-200 bg-slate-50 p-8
+          hover:bg-gradient-to-br hover:from-violet-100 to-white
+          backdrop-blur-md grid-items
+
+          dark:border-zinc-800 dark:bg-zinc-900/60
+          dark:hover:bg-gradient-to-br dark:hover:from-violet-400/10 dark:hover:to-zinc-900
+        "
+      >
+        <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100">
+          Global Events & Geopolitical Context
+        </h3>
+        <p className="mt-3 text-slate-700 dark:text-zinc-400">
+          Occasionally exploring global events, geopolitics, and cross-border
+          developments that influence capital flows and market narratives.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  )
+}
+
+
+ function BlogShowCase(){
+const [blogs, setBlogs] = useState<any[]>([]);
+
+const trendingArticles = async () => {
+  try {
+  
+    const res = await fetch('/api/blog');
+
+    if (!res.ok) throw new Error("Failed to fetch blogs");
+
+    const data = await res.json();
+    console.log(data);
+    setBlogs(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+useEffect(() => {
+  trendingArticles();
+}, []);
 
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900 text-white">
-        {/* Background Image & Gradient */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1611974765270-ca1258634369?q=80&w=2664&auto=format&fit=crop')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/40" />
-
-        {/* Animated Floating Icons Background */}
-        {mounted && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <FloatingIcon icon={TrendingUp} delay={0} x="10%" y="20%" />
-            <FloatingIcon icon={Briefcase} delay={1} x="80%" y="15%" />
-            <FloatingIcon icon={CircleDollarSign} delay={2} x="20%" y="70%" />
-            <FloatingIcon icon={PieChart} delay={1.5} x="70%" y="60%" />
-            <FloatingIcon icon={Landmark} delay={3} x="85%" y="30%" />
-            <FloatingIcon icon={Wallet} delay={2.5} x="15%" y="40%" />
-            <FloatingIcon icon={Globe} delay={0.5} x="50%" y="10%" />
-            <FloatingIcon icon={Coins} delay={3.5} x="60%" y="80%" />
-            {/* Extra small ones for depth */}
-            <motion.div className="absolute top-1/4 left-1/3 text-blue-400/10" animate={{ y: [0, 30, 0] }} transition={{ duration: 7, repeat: Infinity }}>
-              <BarChart3 size={32} />
-            </motion.div>
-            <motion.div className="absolute bottom-1/3 right-1/4 text-blue-400/10" animate={{ y: [0, -40, 0] }} transition={{ duration: 8, repeat: Infinity }}>
-              <Shield size={24} />
-            </motion.div>
-          </div>
-        )}
-
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <span className="inline-block py-1 px-3 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm font-semibold tracking-wide uppercase mb-6 backdrop-blur-sm">
-              Institutional Grade Analysis
-            </span>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold mb-8 leading-tight tracking-tight">
-              Invest with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">Confidence</span>.
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
-              Expert market commentary, data-driven strategies, and long-term financial perspectives for the modern investor.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/articles"
-                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-lg shadow-blue-900/20"
-              >
-                Read Market Insights <ArrowRight size={20} />
-              </Link>
-              <Link
-                href="#about"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-full text-lg font-semibold transition-all border border-white/10"
-              >
-                Our Philosophy
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="about" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">Why Trusted Investors Read Sky</h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              {
-                icon: <TrendingUp size={32} className="text-blue-600" />,
-                title: "Long-Term Vision",
-                desc: "We look past the daily noise to identify secular trends that drive multi-year returns."
-              },
-              {
-                icon: <Shield size={32} className="text-blue-600" />,
-                title: "Risk Management",
-                desc: "Preservation of capital is our priority. We analyze downside risks as rigorously as upside potential."
-              },
-              {
-                icon: <BarChart3 size={32} className="text-blue-600" />,
-                title: "Data-Driven",
-                desc: "Our insights are built on robust financial modeling and historical data, not hype or emotion."
-              }
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all cursor-default group"
-              >
-                <div className="bg-blue-50 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  {feature.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter / CTA Section */}
-      <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
-
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6">Stay Ahead of the Market</h2>
-          <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
-            Join thousands of professional investors who rely on Sky Investment for clarity in complex markets.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-            />
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-blue-900/50 transition-all">
-              Subscribe
-            </button>
-          </div>
-          <p className="text-slate-500 text-sm mt-6">
-            We respect your privacy. Unsubscribe at any time.
-          </p>
-        </div>
-      </section>
+    <section className="w-full bg-white dark:bg-zinc-950 py-12">
+  <div className="mx-auto max-w-6xl px-4">
+    {/* Header */}
+    <div className="mb-14">
+      <h2 className="text-3xl font-extrabold text-slate-900 dark:text-zinc-100">
+        Blog & Insights
+      </h2>
+      <p className="mt-3 w-full text-slate-600 dark:text-zinc-400">
+        Research-driven writing on markets, businesses, and the psychology
+        behind capital and decision-making.
+      </p>
     </div>
+
+    {/* Grid */}
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+      {blogs &&
+        blogs.map((blog, idx) => (
+          <article
+            key={idx}
+            className="group rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden
+                       bg-white dark:bg-zinc-900
+                       hover:shadow-md dark:hover:shadow-xl
+                       transition-all duration-300"
+          >
+            {/* Image */}
+            <div className="h-48 overflow-hidden">
+              <Image
+                src={
+                  blog.coverImage.startsWith("data")
+                    ? blog.coverImage
+                    : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAA..."
+                }
+                alt={blog.title}
+                width={300}
+                height={300}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 leading-snug">
+                {blog.title}
+              </h3>
+
+              <p className="mt-3 text-sm text-slate-600 dark:text-zinc-400 line-clamp-2">
+                {blog.excerpt}
+              </p>
+
+              <div
+                className="mt-3 inline-block rounded-full px-2 py-1 text-[10px] font-semibold uppercase
+                           text-sky-500 bg-sky-100
+                           dark:bg-sky-500/10 dark:text-sky-400"
+              >
+                {blog.category}
+              </div>
+
+              <div className="mt-5 flex items-center justify-between text-xs text-slate-500 dark:text-zinc-500">
+                <span>{blog.readTime}</span>
+                <span
+                  className="font-medium text-slate-700 dark:text-zinc-300
+                             group-hover:text-sky-500 dark:group-hover:text-sky-400 transition"
+                >
+                  Read analysis →
+                </span>
+              </div>
+            </div>
+          </article>
+        ))}
+    </div>
+
+    {/* CTA */}
+    <div className="mt-16 text-center">
+      <button
+        className="rounded-xl border border-slate-300 dark:border-zinc-700
+                   px-6 py-3 text-slate-700 dark:text-zinc-300
+                   hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
+      >
+        <Link href={"/articles"}>View all blogs</Link>
+      </button>
+    </div>
+  </div>
+</section>
+
   );
 }

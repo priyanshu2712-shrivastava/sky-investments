@@ -29,7 +29,6 @@ export async function POST(request: Request) {
                 }
             ).end(buffer);
         });
-
         return NextResponse.json(result);
     } catch (error) {
         console.error('Upload error:', error);

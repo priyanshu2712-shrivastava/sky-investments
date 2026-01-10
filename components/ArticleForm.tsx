@@ -88,7 +88,6 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             const url = initialData
                 ? `/api/articles/${initialData.slug}`
