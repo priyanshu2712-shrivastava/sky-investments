@@ -1,0 +1,134 @@
+'use client';
+
+import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Menu, X, ArrowRight } from 'lucide-react';
+
+export default function Navbar() {
+    const { data: session } = useSession();
+    const pathname = usePathname();
+    const [scrolled, setScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const navLinks = [
+        { name: 'Home', href: '/' },
+        { name: 'Articles', href: '/articles' },
+    ];
+
+    if (session) {
+        navLinks.push({ name: 'Dashboard', href: '/admin' });
+    }
+
+    return (
+        <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled
+                    ? 'bg-white/90 backdrop-blur-md shadow-sm py-4 border-b border-gray-200/50'
+                    : 'bg-transparent py-6 border-b border-transparent'
+                }`}
+        >
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+                {/* Logo */}
+                <Link href="/" className="group relative z-50">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg flex items-center justify-center text-white font-serif font-bold text-lg">
+                            S
+                        </div>
+                        <span className={`font-serif text-xl font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-slate-900'}`}>
+                            Sky Investment
+                        </span>
+                    </div>
+                </Link>
+
+                {/* Desktop Nav */}
+                <div className="hidden md:flex items-center gap-8">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={`text-sm font-medium transition-colors relative group ${pathname === link.href ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                        >
+                            {link.name}
+                            {pathname === link.href && (
+                                <motion.div
+                                    layoutId="underline"
+                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 rounded-full"
+                                />
+                            )}
+                        </Link>
+                    ))}
+
+                    {session ? (
+                        <button
+                            onClick={() => signOut()}
+                            className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                        >
+                            Log out
+                        </button>
+                    ) : (
+                        <Link
+                            href="/articles"
+                            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20"
+                        >
+                            Read Insights <ArrowRight size={14} />
+                        </Link>
+                    )}
+                </div>
+
+                {/* Mobile Toggle */}
+                <button
+                    className="md:hidden relative z-50 p-2 text-slate-800"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                    {mobileMenuOpen ? <X /> : <Menu />}
+                </button>
+            </div>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="absolute top-0 left-0 w-full bg-white shadow-xl border-b border-gray-100 p-6 pt-24 md:hidden flex flex-col gap-6"
+                    >
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`text-lg font-medium ${pathname === link.href ? 'text-blue-600' : 'text-slate-600'
+                                    }`}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+                        {!session && (
+                            <Link
+                                href="/articles"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex justify-center items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-xl text-base font-medium"
+                            >
+                                Read Insights <ArrowRight size={16} />
+                            </Link>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.nav>
+    );
+}
